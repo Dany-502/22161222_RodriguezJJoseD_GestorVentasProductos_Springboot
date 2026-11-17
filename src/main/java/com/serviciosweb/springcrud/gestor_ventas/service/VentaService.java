@@ -104,58 +104,6 @@ public class VentaService {
         return toResponseDTO(ventaGuardada);
     }
 
-    // Actualiza una venta existente reemplazando sus productos y cantidades.
-    @Transactional
-    public VentaResponseDTO updateVenta(Long id, VentaRequestDTO requestDTO) {
-        Venta ventaExistente = buscarVentaPorId(id);
-
-        // Revierten y devuelven el stock a los productos que estaban en la venta
-        // original
-        for (DetalleVenta detalleViejo : ventaExistente.getDetalles()) {
-            Producto prod = detalleViejo.getProducto();
-            prod.setStock(prod.getStock() + detalleViejo.getCantidad());
-        }
-
-        // Limpia los renglones anteriores (orphanRemoval los eliminará en BD)
-        ventaExistente.getDetalles().clear();
-
-        // Procesa los nuevos items de la venta
-        BigDecimal nuevoTotal = BigDecimal.ZERO;
-
-        for (DetalleVentaRequestDTO itemDTO : requestDTO.items()) {
-            Producto producto = buscarProductoPorId(itemDTO.idProducto());
-
-            // Valida stock disponible
-            if (producto.getStock() < itemDTO.cantidad()) {
-                throw new IllegalArgumentException(
-                        "Stock insuficiente para '" + producto.getNombre() +
-                                "'. Disponible: " + producto.getStock() +
-                                ", Solicitado: " + itemDTO.cantidad());
-            }
-
-            // Descuenta nuevo stock
-            producto.setStock(producto.getStock() - itemDTO.cantidad());
-
-            BigDecimal precioUnitario = producto.getPrecio();
-            BigDecimal subtotalRenglon = precioUnitario.multiply(BigDecimal.valueOf(itemDTO.cantidad()));
-
-            DetalleVenta nuevoDetalle = new DetalleVenta(
-                    ventaExistente,
-                    producto,
-                    itemDTO.cantidad(),
-                    precioUnitario,
-                    subtotalRenglon);
-            ventaExistente.addDetalle(nuevoDetalle);
-
-            nuevoTotal = nuevoTotal.add(subtotalRenglon);
-        }
-
-        ventaExistente.setTotal(nuevoTotal);
-
-        Venta ventaActualizada = ventaRepository.save(ventaExistente);
-        return toResponseDTO(ventaActualizada);
-    }
-
     // Elimina una venta del sistema y devuelve todo el stock vendido a los
     // productos correspondientes.
     @Transactional
@@ -214,3 +162,57 @@ public class VentaService {
                 detalle.getSubtotal());
     }
 }
+
+    /*
+    // Actualiza una venta existente reemplazando sus productos y cantidades. (Deshabilitado temporalmente)
+    @Transactional
+    public VentaResponseDTO updateVenta(Long id, VentaRequestDTO requestDTO) {
+        Venta ventaExistente = buscarVentaPorId(id);
+
+        // Revierten y devuelven el stock a los productos que estaban en la venta
+        // original
+        for (DetalleVenta detalleViejo : ventaExistente.getDetalles()) {
+            Producto prod = detalleViejo.getProducto();
+            prod.setStock(prod.getStock() + detalleViejo.getCantidad());
+        }
+
+        // Limpia los renglones anteriores (orphanRemoval los eliminará en BD)
+        ventaExistente.getDetalles().clear();
+
+        // Procesa los nuevos items de la venta
+        BigDecimal nuevoTotal = BigDecimal.ZERO;
+
+        for (DetalleVentaRequestDTO itemDTO : requestDTO.items()) {
+            Producto producto = buscarProductoPorId(itemDTO.idProducto());
+
+            // Valida stock disponible
+            if (producto.getStock() < itemDTO.cantidad()) {
+                throw new IllegalArgumentException(
+                        "Stock insuficiente para '" + producto.getNombre() +
+                                "'. Disponible: " + producto.getStock() +
+                                ", Solicitado: " + itemDTO.cantidad());
+            }
+
+            // Descuenta nuevo stock
+            producto.setStock(producto.getStock() - itemDTO.cantidad());
+
+            BigDecimal precioUnitario = producto.getPrecio();
+            BigDecimal subtotalRenglon = precioUnitario.multiply(BigDecimal.valueOf(itemDTO.cantidad()));
+
+            DetalleVenta nuevoDetalle = new DetalleVenta(
+                    ventaExistente,
+                    producto,
+                    itemDTO.cantidad(),
+                    precioUnitario,
+                    subtotalRenglon);
+            ventaExistente.addDetalle(nuevoDetalle);
+
+            nuevoTotal = nuevoTotal.add(subtotalRenglon);
+        }
+
+        ventaExistente.setTotal(nuevoTotal);
+
+        Venta ventaActualizada = ventaRepository.save(ventaExistente);
+        return toResponseDTO(ventaActualizada);
+    }
+    */

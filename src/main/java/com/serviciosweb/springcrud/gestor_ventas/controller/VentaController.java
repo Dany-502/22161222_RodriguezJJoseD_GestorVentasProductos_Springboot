@@ -61,20 +61,6 @@ public class VentaController {
         return new ResponseEntity<>(nuevaVenta, HttpStatus.CREATED);
     }
 
-    // ENDPOINT PARA ACTUALIZAR UNA VENTA
-    @Operation(summary = "Actualizar una venta existente", description = "Actualiza los productos y cantidad de una venta, ajustando el stock y subtotal.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Venta actualizada exitosamente", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = VentaResponseDTO.class))),
-            @ApiResponse(responseCode = "400", description = "Datos inválidos o stock insuficiente", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "No se encontró la venta con el ID indicado", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponse.class)))
-    })
-    @PutMapping("/{id}")
-    public ResponseEntity<VentaResponseDTO> updateVenta(
-            @PathVariable Long id,
-            @Valid @RequestBody VentaRequestDTO requestDTO) {
-        return ResponseEntity.ok(ventaService.updateVenta(id, requestDTO));
-    }
-
     // ENDPOINT PARA ELIMINAR UNA VENTA
     @Operation(summary = "Eliminar una venta", description = "Elimina una venta por su ID y devuelve el stock a los productos.")
     @ApiResponses(value = {
@@ -87,3 +73,18 @@ public class VentaController {
         return ResponseEntity.noContent().build();
     }
 }
+    /*
+    // ENDPOINT PARA ACTUALIZAR UNA VENTA (Endpoint de prueba :V)
+    @Operation(summary = "Actualizar una venta existente", description = "Actualiza los productos y cantidad de una venta, ajustando el stock y subtotal.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Venta actualizada exitosamente", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = VentaResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Datos inválidos o stock insuficiente", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "No se encontró la venta con el ID indicado", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PutMapping("/{id}")
+    public ResponseEntity<VentaResponseDTO> updateVenta(
+            @PathVariable Long id,
+            @Valid @RequestBody VentaRequestDTO requestDTO) {
+        return ResponseEntity.ok(ventaService.updateVenta(id, requestDTO));
+    }
+    */
