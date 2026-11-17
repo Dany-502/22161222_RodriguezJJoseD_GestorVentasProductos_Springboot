@@ -1,0 +1,45 @@
+server:
+  # Se define el puerto en el que correra el servidor
+  port: 8000
+
+spring:
+  application:
+    # Identificador de la aplicacion para logs, metricas y herramientas de monitoreo
+    name: inventario
+  # Conexion a la base de datos
+  datasource:
+    url: jdbc:postgresql://localhost:5432/inventario # Ajusta el nombre de tu base de datos si es diferente
+    username: postgres
+    password: lokendo2003
+    driver-class-name: org.postgresql.Driver
+  # Persistencia y ORM
+  jpa:
+    hibernate:
+      ddl-auto: update # Indica a hibernate que cree o actualice auto. las tablas y column en postgres
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  security:
+    # Se define un usuario en memoria para Spring Security
+    user:
+      name: admin
+      password: ad12345
+      roles: ACTUATOR_ADMIN
+
+management:
+  endpoints:
+    web:
+      exposure:
+        # Expone /actuator/health y /actuator/info (usa "*" solo en desarrollo local)
+        include: health,info
+  endpoint:
+    health:
+      # Muestra el desglose de componentes (PostgreSQL, disco, etc.)
+      show-details: always
+      probes:
+        enabled: true
+  health:
+    db:
+      # Habilita explícitamente la validación de la conexión JDBC a PostgreSQL
+      enabled: true
